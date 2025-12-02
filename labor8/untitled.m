@@ -1,0 +1,101 @@
+close all
+clear all
+clc
+
+%1. feladat
+Wp = tf(10, conv([5, 1], conv([4, 1], [2, 1])))
+
+% 1.1 feladat ->staibil, mert minden valos resz negativ
+polusok = pole(Wp)
+
+% 1.2 feladat 
+statikusErosites = dcgain(Wp)
+
+%1.3 feladat at kene alakitani ami a papiron van
+
+%1.3.2 feladat
+Ap = 0.035
+Ti = 5
+Wc = tf(Ap/Ti*[Ti, 1], [1, 0])
+
+% ez a megoldasa az 1.3.2-nek
+Wo = minreal(Wc * Wp)
+
+% 1.3.3
+figure()
+margin(Wo)
+[gm, pm, wcg, wcp] = margin(Wo)
+
+% zart kor
+Wry = feedback(Wo, 1, -1)
+ugrasInfo = stepinfo(Wry);
+tulloves = ugrasInfo.Overshoot
+beallasiIdo = ugrasInfo.SettlingTime
+fazistartalek = pm
+
+% 1.3.4 feladat 
+% -> azert 0 mert a nulla polus eltuntette a marado hibat
+maradohiba = 1-dcgain(Wry)
+
+% 1.3.5 feladat
+elsoMaxIdo = ugrasInfo.PeakTime
+
+% 1.3.6 feladat
+% atviteli fv referencia ---> u (beavatkozojel)
+Wru = feedback(Wc, Wp, -1)
+maxBeavatkozo = stepinfo(Wru).Peak
+
+% 1.3.7 -> rajzold le
+figure()
+step(Wry)
+
+%%
+% 2. feladat
+clear all
+close all
+clc
+
+Wp = tf(0.5, conv(conv([1, 0], [1, 1]), [4, 1]))
+
+% 2.1 feladat -> stabilitas hatara mert van 0 benne
+pole(Wp)
+
+% 2.2 feladat -> statikus erosites vegtelen, ezert -> korerosites -> 0.5
+% azert vegtelen mert van nulla polus
+statikusErosites = dcgain(Wp)
+
+% 2.3 feladat
+Ap = 0.6
+N = 10
+T = 4
+
+Tc = T/(N+1)
+Td = N * Tc
+
+% 2.3.2 feladat
+Wc = tf(Ap * [Td+Tc, 1], [Tc, 1] )
+
+Wo = minreal(Wc * Wp)
+
+% 2.3.3 feladat
+figure()
+margin(Wo)
+[gm, pm, wcg, wcp] = margin(Wo)
+
+Wry = feedback(Wo, 1, -1)
+
+figure()
+step(Wry)
+
+stepinfo(Wry)
+
+maradohiba = 1-dcgain(Wry)
+% 0 lesz, mert van egy 0 polusunk, mert a szakaszban van egy sima s es
+% nincs +1
+
+% 2.4 feladat
+% zavarojel d, hibajel e kozotti atviteli fv ugrasvalasza
+Wde = -feedback(Wp, Wc, -1)
+
+figure()
+step(Wde)
