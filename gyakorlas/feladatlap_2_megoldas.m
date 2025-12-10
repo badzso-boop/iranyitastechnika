@@ -151,7 +151,7 @@ maxBeavatkozo = stepinfo(Wru).Peak
 % E = -Wp * D / (1 + Wc * Wp) = -Wp * D / (1 + Wo)
 % Vagy feedback formában:
 
-Wde = -feedback(Wp, Wc); 
+Wde = -feedback(Wp, Wc);
 % Itt nincs -1 az utolsó paraméterben, 
 % ha E/D-t keresünk egy tipik zavaró bevezetésnél
 
